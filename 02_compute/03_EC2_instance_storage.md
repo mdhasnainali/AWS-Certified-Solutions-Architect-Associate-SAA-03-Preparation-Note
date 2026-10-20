@@ -6,14 +6,14 @@
 
 ## 1. The Three Storage Types
 
-|                           | **EBS**              | **Instance Store**               | **EFS**                          |
-| ------------------------- | -------------------- | -------------------------------- | -------------------------------- |
-| What it is                | Network drive        | Physical disk on the host server | Shared network file system (NFS) |
-| Attached to               | 1 instance, 1 AZ     | Only that instance               | 100s of instances, many AZs      |
-| Data after stop/terminate | Survives             | **Lost (ephemeral)**             | Survives                         |
-| Capacity                  | Provision in advance | Fixed by instance type           | Grows automatically, pay per use |
-| OS                        | Linux + Windows      | Linux + Windows                  | **Linux only**                   |
-| Cost                      | Normal               | Included                         | ~3x the price of gp2             |
+| |**EBS**|**Instance Store**|**EFS**|
+|---|---|---|---|
+|What it is|Network drive|Physical disk on the host server|Shared network file system (NFS)|
+|Attached to|1 instance, 1 AZ|Only that instance|100s of instances, many AZs|
+|Data after stop/terminate|Survives|**Lost (ephemeral)**|Survives|
+|Capacity|Provision in advance|Fixed by instance type|Grows automatically, pay per use|
+|OS|Linux + Windows|Linux + Windows|**Linux only**|
+|Cost|Normal|Included|~3x the price of gp2|
 
 ```mermaid
 flowchart LR
@@ -45,21 +45,21 @@ flowchart LR
 
 This attribute decides what happens to the volume when the instance is terminated.
 
-| Volume           | Default      | Meaning                   |
-| ---------------- | ------------ | ------------------------- |
-| Root volume      | **Enabled**  | Deleted with the instance |
-| Any extra volume | **Disabled** | Kept after termination    |
+|Volume|Default|Meaning|
+|---|---|---|
+|Root volume|**Enabled**|Deleted with the instance|
+|Any extra volume|**Disabled**|Kept after termination|
 
 Exam case: to **keep the root volume's data** after terminating the instance, disable delete on termination.
 
 ### 2.3 Volume Types (6 types)
 
-| Type                        | Media | Use for                                                    | Boot volume? |
-| --------------------------- | ----- | ---------------------------------------------------------- | ------------ |
-| **gp2 / gp3**               | SSD   | General purpose, balance of price and performance          | Yes          |
-| **io1 / io2 Block Express** | SSD   | Mission critical, databases, high IOPS                     | Yes          |
-| **st1**                     | HDD   | Big data, data warehouse, log processing (high throughput) | No           |
-| **sc1**                     | HDD   | Archive, rarely accessed, **lowest cost**                  | No           |
+|Type|Media|Use for|Boot volume?|
+|---|---|---|---|
+|**gp2 / gp3**|SSD|General purpose, balance of price and performance|Yes|
+|**io1 / io2 Block Express**|SSD|Mission critical, databases, high IOPS|Yes|
+|**st1**|HDD|Big data, data warehouse, log processing (high throughput)|No|
+|**sc1**|HDD|Archive, rarely accessed, **lowest cost**|No|
 
 **gp2 vs gp3 — a favourite exam point:**
 
@@ -194,18 +194,18 @@ Use cases: content management, web serving, data sharing, WordPress.
 
 ### 6.1 Performance mode
 
-| Mode                          | Use for                                                                         |
-| ----------------------------- | ------------------------------------------------------------------------------- |
-| **General Purpose** (default) | Latency sensitive — web server, CMS                                             |
-| **Max I/O**                   | Higher throughput, highly parallel, higher latency — big data, media processing |
+|Mode|Use for|
+|---|---|
+|**General Purpose** (default)|Latency sensitive — web server, CMS|
+|**Max I/O**|Higher throughput, highly parallel, higher latency — big data, media processing|
 
 ### 6.2 Throughput mode
 
-| Mode                      | Meaning                                                                 |
-| ------------------------- | ----------------------------------------------------------------------- |
-| **Bursting**              | Throughput grows with how much storage you use                          |
-| **Provisioned**           | You set the throughput, independent of storage size                     |
-| **Elastic** (recommended) | Scales up and down automatically — best for **unpredictable workloads** |
+|Mode|Meaning|
+|---|---|
+|**Bursting**|Throughput grows with how much storage you use|
+|**Provisioned**|You set the throughput, independent of storage size|
+|**Elastic** (recommended)|Scales up and down automatically — best for **unpredictable workloads**|
 
 ### 6.3 Storage classes and lifecycle
 
@@ -219,10 +219,10 @@ Use cases: content management, web serving, data sharing, WordPress.
 
 ### 6.4 Availability
 
-| Option                  | Meaning                                                    |
-| ----------------------- | ---------------------------------------------------------- |
-| **Standard (Regional)** | Multi-AZ — use in **production**                           |
-| **One Zone**            | One AZ only, cheaper, has backups — use in **development** |
+|Option|Meaning|
+|---|---|
+|**Standard (Regional)**|Multi-AZ — use in **production**|
+|**One Zone**|One AZ only, cheaper, has backups — use in **development**|
 
 ---
 
@@ -301,20 +301,20 @@ mindmap
 
 ## 10. Key Terms
 
-| Term               | Meaning                                                                     |
-| ------------------ | --------------------------------------------------------------------------- |
-| **EBS**            | Elastic Block Store — network drive attached to one EC2 instance in one AZ  |
-| **IOPS**           | Input/output operations per second — how fast a disk handles requests       |
-| **Throughput**     | How much data moves per second (MB/s)                                       |
-| **Snapshot**       | Point-in-time backup of an EBS volume                                       |
-| **AMI**            | Amazon Machine Image — a pre-configured image used to launch instances      |
-| **Instance Store** | Physical disk on the host server; fast but ephemeral                        |
-| **Ephemeral**      | Temporary — data disappears when the instance stops                         |
-| **Boot volume**    | The volume holding the operating system                                     |
-| **Multi-Attach**   | Attaching one io1/io2 volume to many instances in the same AZ               |
-| **KMS**            | Key Management Service — manages the encryption keys                        |
-| **EFS**            | Elastic File System — managed shared NFS file system                        |
-| **NFS**            | Network File System — protocol for sharing files over a network (port 2049) |
-| **POSIX**          | Standard Linux file system interface — the reason EFS is Linux only         |
-| **Mount target**   | The entry point in an AZ that instances use to reach EFS                    |
-| **FSR**            | Fast Snapshot Restore — removes first-use latency, expensive                |
+|Term|Meaning|
+|---|---|
+|**EBS**|Elastic Block Store — network drive attached to one EC2 instance in one AZ|
+|**IOPS**|Input/output operations per second — how fast a disk handles requests|
+|**Throughput**|How much data moves per second (MB/s)|
+|**Snapshot**|Point-in-time backup of an EBS volume|
+|**AMI**|Amazon Machine Image — a pre-configured image used to launch instances|
+|**Instance Store**|Physical disk on the host server; fast but ephemeral|
+|**Ephemeral**|Temporary — data disappears when the instance stops|
+|**Boot volume**|The volume holding the operating system|
+|**Multi-Attach**|Attaching one io1/io2 volume to many instances in the same AZ|
+|**KMS**|Key Management Service — manages the encryption keys|
+|**EFS**|Elastic File System — managed shared NFS file system|
+|**NFS**|Network File System — protocol for sharing files over a network (port 2049)|
+|**POSIX**|Standard Linux file system interface — the reason EFS is Linux only|
+|**Mount target**|The entry point in an AZ that instances use to reach EFS|
+|**FSR**|Fast Snapshot Restore — removes first-use latency, expensive|

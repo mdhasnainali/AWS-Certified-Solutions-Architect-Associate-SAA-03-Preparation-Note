@@ -59,13 +59,13 @@ An **SCP** is an IAM-style policy attached to an **OU or account**. It limits wh
 
 ### 2.2 Example
 
-| Where                  | SCPs attached            | Result                                       |
-| ---------------------- | ------------------------ | -------------------------------------------- |
-| Management account     | Deny Athena              | **Can still use Athena** — SCPs do not apply |
-| Sandbox OU             | FullAWSAccess + Deny S3  | —                                            |
-| Account A (in Sandbox) | FullAWSAccess + Deny EC2 | Everything **except S3 and EC2**             |
-| Account B (in Sandbox) | nothing extra            | Everything **except S3**                     |
-| Test OU → Account D    | Allow EC2 only           | **Only EC2**                                 |
+|Where|SCPs attached|Result|
+|---|---|---|
+|Management account|Deny Athena|**Can still use Athena** — SCPs do not apply|
+|Sandbox OU|FullAWSAccess + Deny S3|—|
+|Account A (in Sandbox)|FullAWSAccess + Deny EC2|Everything **except S3 and EC2**|
+|Account B (in Sandbox)|nothing extra|Everything **except S3**|
+|Test OU → Account D|Allow EC2 only|**Only EC2**|
 
 Two styles of SCP: a **block list** (allow all, deny some) or an **allow list** (allow only a few services).
 
@@ -96,10 +96,10 @@ A **condition** adds an extra check to a policy statement.
 
 ### 3.1 S3: bucket vs object ARN (exam favourite)
 
-| Level      | Actions                                     | Resource ARN          |
-| ---------- | ------------------------------------------- | --------------------- |
-| **Bucket** | `s3:ListBucket`                             | `arn:aws:s3:::test`   |
-| **Object** | `s3:GetObject`, `PutObject`, `DeleteObject` | `arn:aws:s3:::test/*` |
+|Level|Actions|Resource ARN|
+|---|---|---|
+|**Bucket**|`s3:ListBucket`|`arn:aws:s3:::test`|
+|**Object**|`s3:GetObject`, `PutObject`, `DeleteObject`|`arn:aws:s3:::test/*`|
 
 ---
 
@@ -107,11 +107,11 @@ A **condition** adds an extra check to a policy statement.
 
 For **cross-account** access (user in Account A uses an S3 bucket in Account B), there are two ways:
 
-|                      | Assume an IAM role                          | Resource-based policy                      |
-| -------------------- | ------------------------------------------- | ------------------------------------------ |
-| How                  | User switches into a role in Account B      | Bucket policy in Account B allows the user |
-| Your own permissions | **Given up** while using the role           | **Kept**                                   |
-| Good when            | You only need the other account's resources | You need **both** accounts at once         |
+| |Assume an IAM role|Resource-based policy|
+|---|---|---|
+|How|User switches into a role in Account B|Bucket policy in Account B allows the user|
+|Your own permissions|**Given up** while using the role|**Kept**|
+|Good when|You only need the other account's resources|You need **both** accounts at once|
 
 Example: scan a DynamoDB table in Account A **and** write to S3 in Account B → use a **resource-based policy**.
 
@@ -119,10 +119,10 @@ Example: scan a DynamoDB table in Account A **and** write to S3 in Account B →
 
 ### 4.1 EventBridge — which one does it use?
 
-| Target                                                            | EventBridge uses          |
-| ----------------------------------------------------------------- | ------------------------- |
-| Lambda, SNS, SQS, S3, API Gateway                                 | **Resource-based policy** |
-| Kinesis Data Streams, EC2 Auto Scaling, SSM Run Command, ECS task | **IAM role**              |
+|Target|EventBridge uses|
+|---|---|
+|Lambda, SNS, SQS, S3, API Gateway|**Resource-based policy**|
+|Kinesis Data Streams, EC2 Auto Scaling, SSM Run Command, ECS task|**IAM role**|
 
 ---
 
@@ -172,11 +172,11 @@ flowchart TD
 
 Policy: `Deny sqs:*` and `Allow sqs:DeleteQueue`.
 
-| Action                  | Result     | Why                               |
-| ----------------------- | ---------- | --------------------------------- |
-| `sqs:CreateQueue`       | Denied     | Covered by `Deny sqs:*`           |
-| `sqs:DeleteQueue`       | **Denied** | Explicit Deny wins over the Allow |
-| `ec2:DescribeInstances` | Denied     | Nothing allows it → implicit Deny |
+|Action|Result|Why|
+|---|---|---|
+|`sqs:CreateQueue`|Denied|Covered by `Deny sqs:*`|
+|`sqs:DeleteQueue`|**Denied**|Explicit Deny wins over the Allow|
+|`ec2:DescribeInstances`|Denied|Nothing allows it → implicit Deny|
 
 ---
 
@@ -194,10 +194,10 @@ Policy: `Deny sqs:*` and `Allow sqs:DeleteQueue`.
 
 A **permission set** = a group of IAM policies. You assign it to **users or groups** for **specific accounts**. When the user logs in to that account, Identity Center makes them **assume an IAM role** with those permissions.
 
-| Permission set | Assigned to      | Accounts      | Result             |
-| -------------- | ---------------- | ------------- | ------------------ |
-| Admin access   | Developers group | Dev accounts  | Full access in dev |
-| Read-only      | Developers group | Prod accounts | Read-only in prod  |
+|Permission set|Assigned to|Accounts|Result|
+|---|---|---|---|
+|Admin access|Developers group|Dev accounts|Full access in dev|
+|Read-only|Developers group|Prod accounts|Read-only in prod|
 
 **ABAC** (attribute-based access control): permissions based on user attributes like cost center, title, or locale. Define permission sets once, then change access by changing the user's attributes.
 
@@ -209,20 +209,20 @@ A **permission set** = a group of IAM policies. You assign it to **users or grou
 
 **AWS Directory Services** puts an AD on AWS. Three flavors:
 
-| Flavor                       | What it is                         | Users managed              | MFA | Links to on-premises AD?    |
-| ---------------------------- | ---------------------------------- | -------------------------- | --- | --------------------------- |
-| **AWS Managed Microsoft AD** | A real AD in AWS                   | In AWS **and** on-premises | Yes | Yes, with a **trust**       |
-| **AD Connector**             | A **proxy** to your on-premises AD | Only on-premises           | Yes | Yes, forwards every request |
-| **Simple AD**                | AD-compatible, not Microsoft       | In AWS only                | —   | **No**                      |
+|Flavor|What it is|Users managed|MFA|Links to on-premises AD?|
+|---|---|---|---|---|
+|**AWS Managed Microsoft AD**|A real AD in AWS|In AWS **and** on-premises|Yes|Yes, with a **trust**|
+|**AD Connector**|A **proxy** to your on-premises AD|Only on-premises|Yes|Yes, forwards every request|
+|**Simple AD**|AD-compatible, not Microsoft|In AWS only|—|**No**|
 
 > Exam shortcuts: _proxy to on-premises_ → **AD Connector**. _Manage users in AWS with MFA_ → **Managed Microsoft AD**. _No on-premises AD at all_ → **Simple AD**.
 
 ### 8.1 Connecting Identity Center to AD
 
-| Your AD                    | How to connect                                                                                          |
-| -------------------------- | ------------------------------------------------------------------------------------------------------- |
-| AWS Managed Microsoft AD   | Built-in, out of the box                                                                                |
-| Self-managed (on-premises) | **Two-way trust** with a Managed Microsoft AD, **or** an **AD Connector** (simpler, a bit more latency) |
+|Your AD|How to connect|
+|---|---|
+|AWS Managed Microsoft AD|Built-in, out of the box|
+|Self-managed (on-premises)|**Two-way trust** with a Managed Microsoft AD, **or** an **AD Connector** (simpler, a bit more latency)|
 
 ---
 
@@ -234,10 +234,10 @@ Sets up and runs a **secure, compliant multi-account environment** in a few clic
 
 ### 9.1 Guardrails
 
-| Type           | Job                     | Uses           | Example                                                |
-| -------------- | ----------------------- | -------------- | ------------------------------------------------------ |
-| **Preventive** | **Stop** bad actions    | **SCPs**       | Only allow `us-east-1` and `eu-west-2`                 |
-| **Detective**  | **Find** non-compliance | **AWS Config** | Find untagged resources → SNS alert → Lambda adds tags |
+|Type|Job|Uses|Example|
+|---|---|---|---|
+|**Preventive**|**Stop** bad actions|**SCPs**|Only allow `us-east-1` and `eu-west-2`|
+|**Detective**|**Find** non-compliance|**AWS Config**|Find untagged resources → SNS alert → Lambda adds tags|
 
 ---
 
@@ -301,26 +301,26 @@ mindmap
 
 ## 12. Key terms
 
-| Term                  | Meaning                                                  |
-| --------------------- | -------------------------------------------------------- |
-| AWS Organizations     | Service to manage many accounts together                 |
-| Management account    | Main account of the organization; SCPs never apply to it |
-| Member account        | Any other account in the organization                    |
-| OU                    | Organizational Unit — a folder of accounts               |
-| Consolidated billing  | One bill and payment method for all accounts             |
-| SCP                   | Service Control Policy — limits what an account can do   |
-| Tag policy            | Rule that standardizes tags across accounts              |
-| Condition             | Extra check inside a policy statement                    |
-| Resource-based policy | Policy attached to a resource, like an S3 bucket policy  |
-| Assume role           | Switch into a role and use only its permissions          |
-| Permission boundary   | Maximum permissions for a user or role                   |
-| Explicit Deny         | A written Deny; always wins                              |
-| Implicit Deny         | No Allow found, so denied by default                     |
-| IAM Identity Center   | One login for all accounts and apps (was AWS SSO)        |
-| Permission set        | Group of policies assigned to users for chosen accounts  |
-| ABAC                  | Access based on user attributes like tags or title       |
-| Active Directory      | Microsoft database of users and computers                |
-| AD Connector          | Proxy from AWS to your on-premises AD                    |
-| Simple AD             | Standalone AD-compatible directory, no on-premises link  |
-| Control Tower         | Sets up a best-practice multi-account environment        |
-| Guardrail             | Ongoing rule in Control Tower: preventive or detective   |
+|Term|Meaning|
+|---|---|
+|AWS Organizations|Service to manage many accounts together|
+|Management account|Main account of the organization; SCPs never apply to it|
+|Member account|Any other account in the organization|
+|OU|Organizational Unit — a folder of accounts|
+|Consolidated billing|One bill and payment method for all accounts|
+|SCP|Service Control Policy — limits what an account can do|
+|Tag policy|Rule that standardizes tags across accounts|
+|Condition|Extra check inside a policy statement|
+|Resource-based policy|Policy attached to a resource, like an S3 bucket policy|
+|Assume role|Switch into a role and use only its permissions|
+|Permission boundary|Maximum permissions for a user or role|
+|Explicit Deny|A written Deny; always wins|
+|Implicit Deny|No Allow found, so denied by default|
+|IAM Identity Center|One login for all accounts and apps (was AWS SSO)|
+|Permission set|Group of policies assigned to users for chosen accounts|
+|ABAC|Access based on user attributes like tags or title|
+|Active Directory|Microsoft database of users and computers|
+|AD Connector|Proxy from AWS to your on-premises AD|
+|Simple AD|Standalone AD-compatible directory, no on-premises link|
+|Control Tower|Sets up a best-practice multi-account environment|
+|Guardrail|Ongoing rule in Control Tower: preventive or detective|

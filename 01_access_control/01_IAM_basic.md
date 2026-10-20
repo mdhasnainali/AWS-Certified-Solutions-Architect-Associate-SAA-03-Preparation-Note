@@ -12,12 +12,12 @@ IAM is a **global service**. There is no region to pick. A user you create works
 
 ### 1.2 Root user vs IAM user
 
-|            | Root user                                | IAM user                      |
-| ---------- | ---------------------------------------- | ----------------------------- |
-| Created    | Automatically, when you open the account | By you, inside IAM            |
-| Power      | Full, cannot be limited                  | Only what its policies allow  |
-| Use it for | Setting up the account only              | Everyday work                 |
-| Share it?  | Never                                    | Never — one user = one person |
+| |Root user|IAM user|
+|---|---|---|
+|Created|Automatically, when you open the account|By you, inside IAM|
+|Power|Full, cannot be limited|Only what its policies allow|
+|Use it for|Setting up the account only|Everyday work|
+|Share it?|Never|Never — one user = one person|
 
 > Rule: use root once to set up, then stop using it.
 
@@ -48,17 +48,17 @@ A user gets **all** permissions from **every** group it belongs to, plus any pol
 
 ### 2.2 Policy structure (exam favourite)
 
-| Part        | Meaning                                   | Optional? |
-| ----------- | ----------------------------------------- | --------- |
-| `Version`   | Language version, usually `2012-10-17`    | No        |
-| `Id`        | Name of the policy                        | Yes       |
-| `Statement` | One or more permission blocks             | No        |
-| `Sid`       | Name of one statement                     | Yes       |
-| `Effect`    | `Allow` or `Deny`                         | No        |
-| `Principal` | Which account, user or role it applies to | —         |
-| `Action`    | List of API calls                         | No        |
-| `Resource`  | Which resources the actions apply to      | No        |
-| `Condition` | When the statement applies                | Yes       |
+|Part|Meaning|Optional?|
+|---|---|---|
+|`Version`|Language version, usually `2012-10-17`|No|
+|`Id`|Name of the policy|Yes|
+|`Statement`|One or more permission blocks|No|
+|`Sid`|Name of one statement|Yes|
+|`Effect`|`Allow` or `Deny`|No|
+|`Principal`|Which account, user or role it applies to|—|
+|`Action`|List of API calls|No|
+|`Resource`|Which resources the actions apply to|No|
+|`Condition`|When the statement applies|Yes|
 
 Remember four words: **Effect, Principal, Action, Resource.**
 
@@ -102,12 +102,12 @@ This protects against **brute force** attacks.
 
 **MFA = password you know + device you own.** If a hacker steals the password, they still cannot log in without the physical device.
 
-| MFA device                    | What it is                  | Note                                     |
-| ----------------------------- | --------------------------- | ---------------------------------------- |
-| Virtual MFA device            | Google Authenticator, Authy | Authy supports many tokens on one phone  |
-| U2F security key              | YubiKey by Yubico           | One key can hold many root and IAM users |
-| Hardware key fob              | Gemalto                     | Physical token                           |
-| Hardware key fob for GovCloud | SurePassID                  | US government cloud only                 |
+|MFA device|What it is|Note|
+|---|---|---|
+|Virtual MFA device|Google Authenticator, Authy|Authy supports many tokens on one phone|
+|U2F security key|YubiKey by Yubico|One key can hold many root and IAM users|
+|Hardware key fob|Gemalto|Physical token|
+|Hardware key fob for GovCloud|SurePassID|US government cloud only|
 
 > Protect the **root account** with MFA first, then all IAM users.
 
@@ -115,11 +115,11 @@ This protects against **brute force** attacks.
 
 ## 5. Three ways to access AWS
 
-| Way                | What it is                   | Protected by   |
-| ------------------ | ---------------------------- | -------------- |
-| Management Console | The website                  | Password + MFA |
-| CLI                | Commands in your terminal    | Access keys    |
-| SDK                | Code inside your application | Access keys    |
+|Way|What it is|Protected by|
+|---|---|---|
+|Management Console|The website|Password + MFA|
+|CLI|Commands in your terminal|Access keys|
+|SDK|Code inside your application|Access keys|
 
 ### 5.1 Access keys
 
@@ -164,10 +164,10 @@ A free terminal **inside the browser**, already logged in as your user, with the
 
 ## 6. Security tools (auditing)
 
-| Tool                       | Level   | What it shows                                                                                                              |
-| -------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------- |
-| **IAM Credentials Report** | Account | CSV of all users and the state of their credentials — password last used, MFA on or off, access keys created and last used |
-| **IAM Access Advisor**     | User    | Which services this user actually accessed, and when                                                                       |
+|Tool|Level|What it shows|
+|---|---|---|
+|**IAM Credentials Report**|Account|CSV of all users and the state of their credentials — password last used, MFA on or off, access keys created and last used|
+|**IAM Access Advisor**|User|Which services this user actually accessed, and when|
 
 Access Advisor is how you apply least privilege in practice: see the unused services, then remove those permissions.
 
@@ -241,21 +241,21 @@ mindmap
 
 ## 10. Key terms
 
-| Term               | Meaning                                              |
-| ------------------ | ---------------------------------------------------- |
-| IAM                | Service that manages who can do what in AWS          |
-| Root user          | The first, all-powerful account; use only for setup  |
-| IAM user           | An identity for one real person                      |
-| Group              | A collection of users sharing the same policies      |
-| Policy             | JSON document listing allowed or denied actions      |
-| Inline policy      | A policy attached to one single user                 |
-| Role               | An identity used by AWS services, not people         |
-| Least privilege    | Give only the permissions actually needed            |
-| MFA                | Password plus a physical device for login            |
-| Access key ID      | Public part of CLI/SDK credentials, like a username  |
-| Secret access key  | Private part of CLI/SDK credentials, like a password |
-| CLI                | Tool to run AWS commands in a terminal               |
-| SDK                | Libraries to call AWS from application code          |
-| CloudShell         | Free browser terminal with the CLI ready             |
-| Credentials Report | Account-level CSV of all users and their credentials |
-| Access Advisor     | User-level view of services used and when            |
+|Term|Meaning|
+|---|---|
+|IAM|Service that manages who can do what in AWS|
+|Root user|The first, all-powerful account; use only for setup|
+|IAM user|An identity for one real person|
+|Group|A collection of users sharing the same policies|
+|Policy|JSON document listing allowed or denied actions|
+|Inline policy|A policy attached to one single user|
+|Role|An identity used by AWS services, not people|
+|Least privilege|Give only the permissions actually needed|
+|MFA|Password plus a physical device for login|
+|Access key ID|Public part of CLI/SDK credentials, like a username|
+|Secret access key|Private part of CLI/SDK credentials, like a password|
+|CLI|Tool to run AWS commands in a terminal|
+|SDK|Libraries to call AWS from application code|
+|CloudShell|Free browser terminal with the CLI ready|
+|Credentials Report|Account-level CSV of all users and their credentials|
+|Access Advisor|User-level view of services used and when|

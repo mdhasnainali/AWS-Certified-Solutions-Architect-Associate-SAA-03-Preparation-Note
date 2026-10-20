@@ -19,15 +19,15 @@ EC2 is not one service. It is a group of things:
 
 ### 1.1 What you choose when you create an instance
 
-| Choice           | Options / meaning                                                     |
-| ---------------- | --------------------------------------------------------------------- |
-| Operating system | Linux (most common), Windows, macOS                                   |
-| CPU              | How many vCPUs (compute power)                                        |
-| RAM              | How much memory                                                       |
-| Storage          | Network attached (EBS, EFS) or hardware attached (EC2 Instance Store) |
-| Network          | Network card speed, public IP                                         |
-| Firewall         | Security group                                                        |
-| Boot script      | EC2 User Data                                                         |
+|Choice|Options / meaning|
+|---|---|
+|Operating system|Linux (most common), Windows, macOS|
+|CPU|How many vCPUs (compute power)|
+|RAM|How much memory|
+|Storage|Network attached (EBS, EFS) or hardware attached (EC2 Instance Store)|
+|Network|Network card speed, public IP|
+|Firewall|Security group|
+|Boot script|EC2 User Data|
 
 ### 1.2 EC2 User Data
 
@@ -203,10 +203,10 @@ Good for: batch jobs, data analysis, image processing, flexible start and end ti
 
 ### 7.1 Spot requests
 
-| Request type | What happens                                                           |
-| ------------ | ---------------------------------------------------------------------- |
-| One-time     | Instances launch, then the request disappears                          |
-| Persistent   | The request stays alive and relaunches instances after an interruption |
+|Request type|What happens|
+|---|---|
+|One-time|Instances launch, then the request disappears|
+|Persistent|The request stays alive and relaunches instances after an interruption|
 
 > To remove spot instances for good: **cancel the spot request first, then terminate the instances.** Doing it the other way round makes the request launch them again.
 
@@ -279,22 +279,22 @@ mindmap
 
 ## 10. Key Terms
 
-| Term                 | Meaning                                                                     |
-| -------------------- | --------------------------------------------------------------------------- |
-| EC2                  | Elastic Compute Cloud — rent virtual servers from AWS                       |
-| IaaS                 | Infrastructure as a Service — you rent the machine, you manage the software |
-| AMI                  | Amazon Machine Image — the base image (operating system) of an instance     |
-| EBS                  | Network attached virtual hard drive for an instance                         |
-| Instance Store       | Storage physically attached to the host hardware                            |
-| User Data            | Script that runs once at first boot, as root                                |
-| Bootstrapping        | Running commands automatically when a machine starts                        |
-| Security Group       | Firewall outside the instance controlling inbound and outbound traffic      |
-| Inbound / Outbound   | Traffic coming into the instance / leaving the instance                     |
-| `0.0.0.0/0`          | Any IP address on the internet                                              |
-| SSH                  | Secure Shell — log into a Linux machine over port 22                        |
-| EC2 Instance Connect | Browser based SSH session, no key file needed                               |
-| IAM Role             | A set of permissions attached to an instance instead of stored keys         |
-| Spot Price           | The changing market price of a spot instance                                |
-| Spot Fleet           | A group of spot instances chosen from several launch pools                  |
-| Tenancy              | Whether hardware is shared, dedicated, or a dedicated host                  |
-| AZ                   | Availability Zone — one data centre group inside a region                   |
+|Term|Meaning|
+|---|---|
+|EC2|Elastic Compute Cloud — rent virtual servers from AWS|
+|IaaS|Infrastructure as a Service — you rent the machine, you manage the software|
+|AMI|Amazon Machine Image — the base image (operating system) of an instance|
+|EBS|Network attached virtual hard drive for an instance|
+|Instance Store|Storage physically attached to the host hardware|
+|User Data|Script that runs once at first boot, as root|
+|Bootstrapping|Running commands automatically when a machine starts|
+|Security Group|Firewall outside the instance controlling inbound and outbound traffic|
+|Inbound / Outbound|Traffic coming into the instance / leaving the instance|
+|`0.0.0.0/0`|Any IP address on the internet|
+|SSH|Secure Shell — log into a Linux machine over port 22|
+|EC2 Instance Connect|Browser based SSH session, no key file needed|
+|IAM Role|A set of permissions attached to an instance instead of stored keys|
+|Spot Price|The changing market price of a spot instance|
+|Spot Fleet|A group of spot instances chosen from several launch pools|
+|Tenancy|Whether hardware is shared, dedicated, or a dedicated host|
+|AZ|Availability Zone — one data centre group inside a region|

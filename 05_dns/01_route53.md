@@ -1,4 +1,4 @@
-# AWS-06 — Route 53 (DNS)
+# Route 53 (DNS)
 
 > **Core idea:** DNS turns a name like `example.com` into an IP address. Route 53 is Amazon's own DNS service where you store those name→IP rules (records), plus it can register domains and check if your servers are alive. The exam mostly tests three things: **Alias vs CNAME**, **the 7 routing policies**, and **health checks**.
 
@@ -12,23 +12,23 @@
 
 For `http://api.www.example.com.`
 
-| Part                  | Name                   | Meaning                       |
-| --------------------- | ---------------------- | ----------------------------- |
-| `.` (last dot)        | Root                   | Top of the whole DNS tree     |
-| `.com`                | TLD (top level domain) | `.com`, `.org`, `.gov`, `.in` |
-| `example.com`         | Second level domain    | The name you buy              |
-| `www.example.com`     | Subdomain              | A name under your domain      |
-| `api.www.example.com` | FQDN                   | Fully qualified domain name   |
-| `http`                | Protocol               | The whole line is the **URL** |
+|Part|Name|Meaning|
+|---|---|---|
+|`.` (last dot)|Root|Top of the whole DNS tree|
+|`.com`|TLD (top level domain)|`.com`, `.org`, `.gov`, `.in`|
+|`example.com`|Second level domain|The name you buy|
+|`www.example.com`|Subdomain|A name under your domain|
+|`api.www.example.com`|FQDN|Fully qualified domain name|
+|`http`|Protocol|The whole line is the **URL**|
 
 ### 1.2 Words you need
 
-| Term             | Meaning                                      |
-| ---------------- | -------------------------------------------- |
-| Domain registrar | Where you buy a domain (Route 53, GoDaddy…)  |
-| DNS record       | One rule: name → value (A, AAAA, CNAME, NS…) |
-| Zone file        | The file holding all records                 |
-| Name server      | A server that answers DNS questions          |
+|Term|Meaning|
+|---|---|
+|Domain registrar|Where you buy a domain (Route 53, GoDaddy…)|
+|DNS record|One rule: name → value (A, AAAA, CNAME, NS…)|
+|Zone file|The file holding all records|
+|Name server|A server that answers DNS questions|
 
 ### 1.3 How a lookup happens
 
@@ -60,12 +60,12 @@ Domain/subdomain name, record **type**, **value**, **routing policy**, and **TTL
 
 ### 2.2 Record types to know
 
-| Type      | Maps                            | Example                                   |
-| --------- | ------------------------------- | ----------------------------------------- |
-| **A**     | hostname → IPv4                 | `example.com` → `1.2.3.4`                 |
-| **AAAA**  | hostname → IPv6                 | `example.com` → `2001:db8::1`             |
-| **CNAME** | hostname → another hostname     | `www.example.com` → `blabla.anything.com` |
-| **NS**    | Name servers of the hosted zone | Controls who answers for your domain      |
+|Type|Maps|Example|
+|---|---|---|
+|**A**|hostname → IPv4|`example.com` → `1.2.3.4`|
+|**AAAA**|hostname → IPv6|`example.com` → `2001:db8::1`|
+|**CNAME**|hostname → another hostname|`www.example.com` → `blabla.anything.com`|
+|**NS**|Name servers of the hosted zone|Controls who answers for your domain|
 
 > A **CNAME cannot be created at the zone apex** (the bare domain). `www.example.com` is allowed; `example.com` is not.
 
@@ -73,11 +73,11 @@ Domain/subdomain name, record **type**, **value**, **routing policy**, and **TTL
 
 A **hosted zone** is a container of records for one domain and its subdomains.
 
-|               | Public hosted zone        | Private hosted zone            |
-| ------------- | ------------------------- | ------------------------------ |
-| Who can query | Anyone on the internet    | Only resources inside your VPC |
-| Answers with  | Public IPs                | Private IPs                    |
-| Example       | `app1.mypublicdomain.com` | `db.company.internal`          |
+| |Public hosted zone|Private hosted zone|
+|---|---|---|
+|Who can query|Anyone on the internet|Only resources inside your VPC|
+|Answers with|Public IPs|Private IPs|
+|Example|`app1.mypublicdomain.com`|`db.company.internal`|
 
 Cost: **$0.50 per hosted zone per month**, and a registered domain costs **minimum $12 per year**.
 
@@ -87,10 +87,10 @@ Cost: **$0.50 per hosted zone per month**, and a registered domain costs **minim
 
 **TTL (Time To Live)** tells the client how many seconds to cache the answer. During that time the client does **not** ask Route 53 again.
 
-| TTL              | Traffic to Route 53     | Risk                                         |
-| ---------------- | ----------------------- | -------------------------------------------- |
-| High (e.g. 24 h) | Low traffic, lower cost | Clients keep outdated records for up to 24 h |
-| Low (e.g. 60 s)  | More traffic, more cost | Records are outdated for a short time only   |
+|TTL|Traffic to Route 53|Risk|
+|---|---|---|
+|High (e.g. 24 h)|Low traffic, lower cost|Clients keep outdated records for up to 24 h|
+|Low (e.g. 60 s)|More traffic, more cost|Records are outdated for a short time only|
 
 **Safe way to change a record:** lower the TTL first, wait until all old caches expire, change the value, then raise the TTL back.
 
@@ -149,16 +149,17 @@ A routing policy decides **how Route 53 answers a DNS query**. Traffic never flo
 | **IP-based**     | Route by the client's IP **CIDR** range                                                 | Yes                      | Use when you know the ISP's IP ranges                                      |
 | **Multi-Value**  | Returns up to **8 healthy records**; client picks one                                   | Yes                      | Client-side load balancing, **not** a replacement for an ELB               |
 
+
 ### 5.1 Weighted vs Latency vs Geolocation — pick the right one
 
-| Exam wording                                                 | Answer              |
-| ------------------------------------------------------------ | ------------------- |
-| "send 10% of traffic to the new version"                     | Weighted            |
-| "best performance / fastest response for users"              | Latency             |
-| "show French content to users in France" / "block a country" | Geolocation         |
-| "shift traffic from one region to another gradually"         | Geoproximity (bias) |
-| "automatic disaster recovery to a standby site"              | Failover            |
-| "return several healthy IPs, client chooses"                 | Multi-Value         |
+|Exam wording|Answer|
+|---|---|
+|"send 10% of traffic to the new version"|Weighted|
+|"best performance / fastest response for users"|Latency|
+|"show French content to users in France" / "block a country"|Geolocation|
+|"shift traffic from one region to another gradually"|Geoproximity (bias)|
+|"automatic disaster recovery to a standby site"|Failover|
+|"return several healthy IPs, client chooses"|Multi-Value|
 
 ### 5.2 Geoproximity bias in one picture
 
@@ -220,10 +221,10 @@ Now Route 53 is the source of truth for your records.
 
 By default the Route 53 Resolver answers queries for your EC2 local names, private hosted zones and public records — **inside AWS only**. To make DNS work both ways with an on-premises data center you add **resolver endpoints** (a VPN or Direct Connect must already exist).
 
-| Endpoint     | Direction         | Meaning                                            |
-| ------------ | ----------------- | -------------------------------------------------- |
-| **Inbound**  | On-premises → AWS | On-prem servers can resolve AWS private names      |
-| **Outbound** | AWS → On-premises | EC2 can resolve names like `web.onpremise.private` |
+|Endpoint|Direction|Meaning|
+|---|---|---|
+|**Inbound**|On-premises → AWS|On-prem servers can resolve AWS private names|
+|**Outbound**|AWS → On-premises|EC2 can resolve names like `web.onpremise.private`|
 
 ```mermaid
 flowchart LR
@@ -293,16 +294,16 @@ mindmap
 
 ## 11. Key Terms
 
-| Term                    | Meaning                                                               |
-| ----------------------- | --------------------------------------------------------------------- |
-| Authoritative DNS       | DNS where the customer controls the records                           |
-| Hosted zone             | Container of DNS records for a domain                                 |
-| Zone apex               | The bare domain, e.g. `example.com`                                   |
-| FQDN                    | Full name including all subdomains                                    |
-| TTL                     | Seconds a client caches a DNS answer                                  |
-| Alias record            | Route 53-only record pointing to an AWS resource, free, works at apex |
-| Bias                    | Number in Geoproximity that grows or shrinks a region's area          |
-| CIDR                    | An IP address range, used by IP-based routing                         |
-| Calculated health check | Parent check combining child checks with AND/OR/NOT                   |
-| Resolver endpoint       | Inbound/outbound gateway for DNS between AWS and on-premises          |
-| Traffic Flow            | Advanced Route 53 feature required for Geoproximity                   |
+|Term|Meaning|
+|---|---|
+|Authoritative DNS|DNS where the customer controls the records|
+|Hosted zone|Container of DNS records for a domain|
+|Zone apex|The bare domain, e.g. `example.com`|
+|FQDN|Full name including all subdomains|
+|TTL|Seconds a client caches a DNS answer|
+|Alias record|Route 53-only record pointing to an AWS resource, free, works at apex|
+|Bias|Number in Geoproximity that grows or shrinks a region's area|
+|CIDR|An IP address range, used by IP-based routing|
+|Calculated health check|Parent check combining child checks with AND/OR/NOT|
+|Resolver endpoint|Inbound/outbound gateway for DNS between AWS and on-premises|
+|Traffic Flow|Advanced Route 53 feature required for Geoproximity|

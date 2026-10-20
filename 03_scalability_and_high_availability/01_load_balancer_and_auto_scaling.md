@@ -13,8 +13,7 @@
 | **Vertical scaling**   | Make one machine bigger | scale up / down | `t2.micro` → `t2.large` |
 | **Horizontal scaling** | Use more machines       | scale out / in  | 1 EC2 → 6 EC2           |
 
-Vertical scaling is used for things that cannot be split, like a database (RDS, ElastiCache). There is always a hardware limit.
-Horizontal scaling needs a **distributed system** — the app must work on many machines at once.
+Vertical scaling is used for things that cannot be split, like a database (RDS, ElastiCache). There is always a hardware limit. Horizontal scaling needs a **distributed system** — the app must work on many machines at once.
 
 Smallest instance: `t2.nano` (0.5 GB RAM, 1 vCPU). Largest: `u-12tb1.metal` (12.3 TB RAM, 448 vCPUs).
 
@@ -22,10 +21,10 @@ Smallest instance: `t2.nano` (0.5 GB RAM, 1 vCPU). Largest: `u-12tb1.metal` (12.
 
 **High availability (HA)** means running in at least **2 Availability Zones**, so you survive the loss of one data center.
 
-| Type       | Meaning                  | Example                   |
-| ---------- | ------------------------ | ------------------------- |
-| Passive HA | A standby copy waits     | RDS Multi-AZ              |
-| Active HA  | All copies serve traffic | ASG + ELB across multi-AZ |
+|Type|Meaning|Example|
+|---|---|---|
+|Passive HA|A standby copy waits|RDS Multi-AZ|
+|Active HA|All copies serve traffic|ASG + ELB across multi-AZ|
 
 > Scalability = handle more load. High availability = survive a failure. They are linked but different.
 
@@ -49,12 +48,12 @@ ELB is **managed** by AWS: AWS handles upgrades, maintenance and HA.
 
 ### 2.1 The four load balancer types
 
-| Type                  | Year | Layer | Protocols              | Use when                             |
-| --------------------- | ---- | ----- | ---------------------- | ------------------------------------ |
-| **CLB** (Classic)     | 2009 | 4 & 7 | HTTP, HTTPS, TCP, SSL  | Legacy only — deprecated             |
-| **ALB** (Application) | 2016 | 7     | HTTP, HTTPS, WebSocket | Web apps, microservices, containers  |
-| **NLB** (Network)     | 2017 | 4     | TCP, TLS, UDP          | Extreme performance, static IP       |
-| **GWLB** (Gateway)    | 2020 | 3     | IP / GENEVE 6081       | Firewall, IDS/IPS, packet inspection |
+|Type|Year|Layer|Protocols|Use when|
+|---|---|---|---|---|
+|**CLB** (Classic)|2009|4 & 7|HTTP, HTTPS, TCP, SSL|Legacy only — deprecated|
+|**ALB** (Application)|2016|7|HTTP, HTTPS, WebSocket|Web apps, microservices, containers|
+|**NLB** (Network)|2017|4|TCP, TLS, UDP|Extreme performance, static IP|
+|**GWLB** (Gateway)|2020|3|IP / GENEVE 6081|Firewall, IDS/IPS, packet inspection|
 
 Load balancers can be **internal** (private) or **internet-facing** (public).
 
@@ -76,11 +75,11 @@ Layer 7 only (HTTP). It routes to **target groups**.
 
 **Routing rules** can match on:
 
-| Rule based on         | Example                                   |
-| --------------------- | ----------------------------------------- |
-| Path                  | `/users` vs `/posts`                      |
-| Hostname              | `one.example.com` vs `other.example.com`  |
-| Query string / header | `?Platform=Mobile` vs `?Platform=Desktop` |
+|Rule based on|Example|
+|---|---|
+|Path|`/users` vs `/posts`|
+|Hostname|`one.example.com` vs `other.example.com`|
+|Query string / header|`?Platform=Mobile` vs `?Platform=Desktop`|
 
 Other ALB features: HTTP/2, WebSocket, redirect HTTP → HTTPS, port mapping for ECS containers.
 
@@ -90,11 +89,11 @@ Other ALB features: HTTP/2, WebSocket, redirect HTTP → HTTPS, port mapping for
 
 The ALB terminates the connection. The backend sees the **load balancer's private IP**. The real client info arrives in headers:
 
-| Header              | Carries       |
-| ------------------- | ------------- |
-| `X-Forwarded-For`   | Client IP     |
-| `X-Forwarded-Port`  | Client port   |
-| `X-Forwarded-Proto` | Protocol used |
+|Header|Carries|
+|---|---|
+|`X-Forwarded-For`|Client IP|
+|`X-Forwarded-Port`|Client port|
+|`X-Forwarded-Proto`|Protocol used|
 
 > One ALB can serve many applications. With CLB you needed one load balancer per application.
 
@@ -110,8 +109,7 @@ Its special feature: **one static IP per AZ**, and you can attach an **Elastic I
 
 > Exam triggers: **UDP**, **extreme performance**, or **static / whitelisted IPs** → NLB.
 
-Target groups: EC2 instances, **private IP addresses**, or even an **ALB** (NLB in front of ALB = static IP plus HTTP rules).
-NLB health checks support **TCP, HTTP and HTTPS**.
+Target groups: EC2 instances, **private IP addresses**, or even an **ALB** (NLB in front of ALB = static IP plus HTTP rules). NLB health checks support **TCP, HTTP and HTTPS**.
 
 ### 4.2 GWLB — Gateway Load Balancer
 
@@ -140,17 +138,16 @@ The same client keeps going to the **same backend instance**. It works with a co
 
 Works on CLB, ALB and NLB.
 
-| Cookie type       | Created by                   | Name                           |
-| ----------------- | ---------------------------- | ------------------------------ |
-| Application-based | Your application, or the ALB | custom name, or `AWSALBAPP`    |
-| Duration-based    | The load balancer            | `AWSALB` (ALB), `AWSELB` (CLB) |
+|Cookie type|Created by|Name|
+|---|---|---|
+|Application-based|Your application, or the ALB|custom name, or `AWSALBAPP`|
+|Duration-based|The load balancer|`AWSALB` (ALB), `AWSELB` (CLB)|
 
 Reserved names you must not use: `AWSALB`, `AWSALBAPP`, `AWSALBTG`. Stickiness is enabled at the **target group** level.
 
 ### 5.2 Cross-zone load balancing
 
-**On:** every LB node spreads traffic over **all** instances in **all** AZs.
-**Off:** each LB node only sends to instances in **its own AZ** — so unbalanced AZs get unbalanced traffic.
+**On:** every LB node spreads traffic over **all** instances in **all** AZs. **Off:** each LB node only sends to instances in **its own AZ** — so unbalanced AZs get unbalanced traffic.
 
 | Load balancer | Default                                    | Inter-AZ data charge |
 | ------------- | ------------------------------------------ | -------------------- |
@@ -179,10 +176,10 @@ An SSL/TLS certificate encrypts traffic **in flight** between client and load ba
 
 Gives in-flight requests time to finish while an instance is being deregistered or is unhealthy. No new connections go to it.
 
-| Load balancer | Name of the setting  |
-| ------------- | -------------------- |
-| CLB           | Connection Draining  |
-| ALB / NLB     | Deregistration Delay |
+|Load balancer|Name of the setting|
+|---|---|
+|CLB|Connection Draining|
+|ALB / NLB|Deregistration Delay|
 
 Range **1–3600 seconds**, default **300 seconds**. Set `0` to disable. Short requests → low value (fast removal). Long uploads → high value.
 
@@ -223,12 +220,12 @@ The ELB health check can be passed to the ASG, so the ASG terminates instances t
 
 ### 6.2 Good metrics to scale on
 
-| Metric                     | Use when                                     |
-| -------------------------- | -------------------------------------------- |
-| `CPUUtilization`           | General compute load                         |
-| `RequestCountPerTarget`    | You know the best request count per instance |
-| `NetworkIn` / `NetworkOut` | App is network-bound (uploads, downloads)    |
-| Custom CloudWatch metric   | Application-specific need                    |
+|Metric|Use when|
+|---|---|
+|`CPUUtilization`|General compute load|
+|`RequestCountPerTarget`|You know the best request count per instance|
+|`NetworkIn` / `NetworkOut`|App is network-bound (uploads, downloads)|
+|Custom CloudWatch metric|Application-specific need|
 
 ### 6.3 Scaling cooldown
 
@@ -295,21 +292,21 @@ mindmap
 
 ## 9. Key terms
 
-| Term                    | Meaning                                                                              |
-| ----------------------- | ------------------------------------------------------------------------------------ |
-| **Vertical scaling**    | Increase the size of one instance                                                    |
-| **Horizontal scaling**  | Increase the number of instances (scale out / in)                                    |
-| **High availability**   | Running in 2 or more Availability Zones                                              |
-| **ELB**                 | Elastic Load Balancing — AWS managed load balancer                                   |
-| **Target group**        | The set of backends (EC2, IP, Lambda, ECS) a listener forwards to                    |
-| **Health check**        | Port + path test that decides if a target gets traffic                               |
-| **Listener**            | The port and protocol the load balancer accepts traffic on                           |
-| **Sticky session**      | Cookie that keeps one client on one backend instance                                 |
-| **Cross-zone LB**       | Each LB node spreads traffic to targets in every AZ                                  |
-| **SSL termination**     | LB decrypts HTTPS, then talks HTTP to the backend                                    |
-| **SNI**                 | Client names the hostname in the TLS handshake, so one LB can hold many certificates |
-| **ACM**                 | AWS Certificate Manager — stores and renews SSL/TLS certificates                     |
-| **Connection draining** | Time given to finish in-flight requests before removing an instance                  |
-| **ASG**                 | Auto Scaling Group — adds and removes EC2 instances automatically                    |
-| **Launch template**     | Blueprint describing how ASG instances are launched                                  |
-| **Cooldown**            | Pause after a scaling action, default 300 seconds                                    |
+|Term|Meaning|
+|---|---|
+|**Vertical scaling**|Increase the size of one instance|
+|**Horizontal scaling**|Increase the number of instances (scale out / in)|
+|**High availability**|Running in 2 or more Availability Zones|
+|**ELB**|Elastic Load Balancing — AWS managed load balancer|
+|**Target group**|The set of backends (EC2, IP, Lambda, ECS) a listener forwards to|
+|**Health check**|Port + path test that decides if a target gets traffic|
+|**Listener**|The port and protocol the load balancer accepts traffic on|
+|**Sticky session**|Cookie that keeps one client on one backend instance|
+|**Cross-zone LB**|Each LB node spreads traffic to targets in every AZ|
+|**SSL termination**|LB decrypts HTTPS, then talks HTTP to the backend|
+|**SNI**|Client names the hostname in the TLS handshake, so one LB can hold many certificates|
+|**ACM**|AWS Certificate Manager — stores and renews SSL/TLS certificates|
+|**Connection draining**|Time given to finish in-flight requests before removing an instance|
+|**ASG**|Auto Scaling Group — adds and removes EC2 instances automatically|
+|**Launch template**|Blueprint describing how ASG instances are launched|
+|**Cooldown**|Pause after a scaling action, default 300 seconds|

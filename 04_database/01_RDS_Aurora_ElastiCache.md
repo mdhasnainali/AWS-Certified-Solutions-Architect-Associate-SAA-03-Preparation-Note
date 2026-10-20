@@ -14,14 +14,14 @@ PostgreSQL · MySQL · MariaDB · Oracle · Microsoft SQL Server · IBM DB2 · *
 
 ### 1.2 RDS vs database on your own EC2
 
-|                                 | RDS         | DB on EC2    |
-| ------------------------------- | ----------- | ------------ |
-| Setup and OS patching           | AWS does it | You do it    |
-| Backups + Point-in-Time Restore | Automatic   | You build it |
-| Read Replicas, Multi-AZ         | Built in    | You build it |
-| Monitoring dashboards           | Built in    | You build it |
-| **SSH into server**             | **No**      | Yes          |
-| Storage                         | EBS         | EBS          |
+| |RDS|DB on EC2|
+|---|---|---|
+|Setup and OS patching|AWS does it|You do it|
+|Backups + Point-in-Time Restore|Automatic|You build it|
+|Read Replicas, Multi-AZ|Built in|You build it|
+|Monitoring dashboards|Built in|You build it|
+|**SSH into server**|**No**|Yes|
+|Storage|EBS|EBS|
 
 Scaling: **vertical** = bigger instance type. **Horizontal** = add Read Replicas.
 
@@ -54,15 +54,15 @@ flowchart LR
   end
 ```
 
-|                       | Read Replicas                            | Multi-AZ                        |
-| --------------------- | ---------------------------------------- | ------------------------------- |
-| Purpose               | **Scale reads**                          | **Disaster recovery**           |
-| Copy type             | **Asynchronous** (eventually consistent) | **Synchronous**                 |
-| How many              | Up to **15**                             | 1 standby                       |
-| Location              | Same AZ, cross-AZ, **cross-region**      | Another AZ                      |
-| Can app read from it? | Yes (`SELECT` only)                      | **No** — standby only           |
-| Connection            | App must update connection string        | **One DNS name**, auto failover |
-| Special               | Can be **promoted** to its own DB        | Standby becomes new master      |
+| |Read Replicas|Multi-AZ|
+|---|---|---|
+|Purpose|**Scale reads**|**Disaster recovery**|
+|Copy type|**Asynchronous** (eventually consistent)|**Synchronous**|
+|How many|Up to **15**|1 standby|
+|Location|Same AZ, cross-AZ, **cross-region**|Another AZ|
+|Can app read from it?|Yes (`SELECT` only)|**No** — standby only|
+|Connection|App must update connection string|**One DNS name**, auto failover|
+|Special|Can be **promoted** to its own DB|Standby becomes new master|
 
 **Network cost:** Replica in **same region** (different AZ) = **free**. **Cross-region** replica = **you pay**.
 
@@ -96,13 +96,13 @@ Normal RDS = no OS access. **RDS Custom** = you get **OS + database access** (SS
 
 ### 4.2 Aurora vs RDS
 
-|                          | RDS                            | Aurora                        |
-| ------------------------ | ------------------------------ | ----------------------------- |
-| Storage                  | You set size (or auto scaling) | Auto grows **10 GB → 256 TB** |
-| Read replicas            | 15                             | **15**, lag **< 10 ms**       |
-| Failover                 | Slower                         | **< 30 seconds**              |
-| Data copies              | 1 (+ standby)                  | **6 copies across 3 AZs**     |
-| Backups can be disabled? | Yes                            | **No**                        |
+| |RDS|Aurora|
+|---|---|---|
+|Storage|You set size (or auto scaling)|Auto grows **10 GB → 256 TB**|
+|Read replicas|15|**15**, lag **< 10 ms**|
+|Failover|Slower|**< 30 seconds**|
+|Data copies|1 (+ standby)|**6 copies across 3 AZs**|
+|Backups can be disabled?|Yes|**No**|
 
 ### 4.3 How storage stays available
 
@@ -163,10 +163,10 @@ Restoring any backup or snapshot always creates a **new database**.
 
 ### 5.2 Restore from S3 (on-premises → AWS)
 
-| Target       | Steps                                                        |
-| ------------ | ------------------------------------------------------------ |
-| RDS MySQL    | On-prem backup → S3 → new RDS instance                       |
-| Aurora MySQL | Backup with **Percona XtraBackup** → S3 → new Aurora cluster |
+|Target|Steps|
+|---|---|
+|RDS MySQL|On-prem backup → S3 → new RDS instance|
+|Aurora MySQL|Backup with **Percona XtraBackup** → S3 → new Aurora cluster|
 
 ### 5.3 Aurora Cloning
 
@@ -201,13 +201,13 @@ flowchart LR
   P -- "few connections" --> D["RDS or Aurora"]
 ```
 
-| Benefit           | Detail                              |
-| ----------------- | ----------------------------------- |
-| Fewer connections | Less CPU/RAM stress, fewer timeouts |
-| Faster failover   | Up to **66%** less failover time    |
-| Force IAM login   | Credentials in **Secrets Manager**  |
-| Security          | **Never public**, only inside VPC   |
-| Code change       | **None** — just change the endpoint |
+|Benefit|Detail|
+|---|---|
+|Fewer connections|Less CPU/RAM stress, fewer timeouts|
+|Faster failover|Up to **66%** less failover time|
+|Force IAM login|Credentials in **Secrets Manager**|
+|Security|**Never public**, only inside VPC|
+|Code change|**None** — just change the endpoint|
 
 Serverless, auto scaling, Multi-AZ.
 
@@ -219,7 +219,7 @@ Serverless, auto scaling, Multi-AZ.
 
 ### 7.1 What it is
 
-Managed **Redis** or **Memcached**. A cache = **in-memory database**, very fast, low latency.
+Managed **Valkey**, **Redis OSS** or **Memcached**. A cache = **in-memory database**, very fast, low latency.
 
 Two main uses:
 
@@ -228,55 +228,79 @@ Two main uses:
 
 > ElastiCache needs **heavy application code changes**. It is not a switch you just turn on.
 
-### 7.2 Redis vs Memcached
+### 7.2 What is Valkey?
 
-|                   | Redis                                               | Memcached          |
-| ----------------- | --------------------------------------------------- | ------------------ |
-| High availability | **Multi-AZ + auto failover**                        | No                 |
-| Replication       | **Read replicas**                                   | No (sharding only) |
-| Durability        | **AOF persistence**, backup/restore                 | Can lose data      |
-| Special           | **Sorted Sets** (leaderboards)                      | **Multi-threaded** |
-| Auth              | **IAM** (Redis only), **Redis AUTH** password/token | **SASL**           |
+In March 2024, Redis stopped being fully open source. So the Linux Foundation **copied Redis OSS 7.2** and made a free, open-source version called **Valkey**.
 
-Simple picture: **Redis = copies (replication). Memcached = pieces (sharding).**
+| Point | Detail |
+|---|---|
+| Relation to Redis | **Drop-in replacement** — same commands, same clients, no code change |
+| AWS status | **Recommended** default engine for new caches |
+| Price | Node-based **20% cheaper**, Serverless **33% cheaper** than Redis OSS |
+| Serverless minimum | **100 MB** (Redis OSS: 1 GB) |
+| Move from Redis OSS | In-place upgrade, **zero downtime** |
 
-### 7.3 Caching patterns
+**Simple rule: Valkey = Redis, but open source and cheaper. Everything true for Redis is true for Valkey.**
 
-| Pattern           | How it works                                        | Downside              |
-| ----------------- | --------------------------------------------------- | --------------------- |
-| **Lazy Loading**  | Read cache → miss → read DB → write to cache        | Data can be **stale** |
-| **Write Through** | Write to cache every time you write to DB           | No stale data         |
-| **Session Store** | Save sessions with **TTL** (time to live) to expire | —                     |
+### 7.3 Valkey / Redis vs Memcached
+
+| | Valkey / Redis OSS | Memcached |
+|---|---|---|
+| High availability | **Multi-AZ + auto failover** | No |
+| Replication | **Read replicas** | No (sharding only) |
+| Durability | **AOF persistence**, backup/restore | Can lose data |
+| Special | **Sorted Sets** (leaderboards) | **Multi-threaded** |
+| Auth | **IAM**, **AUTH** password/token | **SASL** |
+
+Simple picture: **Valkey/Redis = copies (replication). Memcached = pieces (sharding).**
+
+### 7.4 Caching patterns
+
+| Pattern | How it works | Downside |
+|---|---|---|
+| **Lazy Loading** | Read cache → miss → read DB → write to cache | Data can be **stale** |
+| **Write Through** | Write to cache every time you write to DB | No stale data |
+| **Session Store** | Save sessions with **TTL** (time to live) to expire | — |
 
 ```mermaid
+
 flowchart LR
-  A["App"] -- "1 ask" --> C["ElastiCache"]
-  C -- "hit · return data" --> A
-  A -- "2 miss · read" --> D["RDS"]
-  A -- "3 write back" --> C
+
+A["App"] -- "1 ask" --> C["ElastiCache"]
+
+C -- "hit · return data" --> A
+
+A -- "2 miss · read" --> D["RDS"]
+
+A -- "3 write back" --> C
+
 ```
 
-**Exam hint: "real-time gaming leaderboard" → Redis Sorted Sets.**
+**Exam hints:**
+
+- "Real-time gaming leaderboard" → **Valkey/Redis Sorted Sets**.
+- Exam questions may still say "Redis". Treat **Valkey the same as Redis**.
+- "Cheapest Redis-compatible cache" → **Valkey**.
 
 ---
 
 ## 8. Exam Scenario Quick Table
 
-| If the question says...                        | Answer                        |
-| ---------------------------------------------- | ----------------------------- |
-| Scale reads / reporting workload               | Read Replica                  |
-| Disaster recovery, auto failover in another AZ | Multi-AZ                      |
-| OS access on Oracle / SQL Server               | RDS Custom                    |
-| Storage may run out, unpredictable             | RDS Storage Auto Scaling      |
-| Cross-region replication **< 1 second**        | Aurora Global Database        |
-| Unpredictable, intermittent DB usage           | Aurora Serverless             |
-| SQL Server app → Aurora, no code change        | Babelfish                     |
-| Fast staging copy of Aurora prod               | Aurora Cloning                |
-| Encrypt an unencrypted DB                      | Snapshot → restore encrypted  |
-| Lambda with too many DB connections            | RDS Proxy                     |
-| Enforce IAM auth for DB                        | RDS Proxy (+ Secrets Manager) |
-| Make app stateless / store sessions            | ElastiCache                   |
-| Real-time leaderboard                          | ElastiCache Redis Sorted Sets |
+|If the question says...|Answer|
+|---|---|
+|Scale reads / reporting workload|Read Replica|
+|Disaster recovery, auto failover in another AZ|Multi-AZ|
+|OS access on Oracle / SQL Server|RDS Custom|
+|Storage may run out, unpredictable|RDS Storage Auto Scaling|
+|Cross-region replication **< 1 second**|Aurora Global Database|
+|Unpredictable, intermittent DB usage|Aurora Serverless|
+|SQL Server app → Aurora, no code change|Babelfish|
+|Fast staging copy of Aurora prod|Aurora Cloning|
+|Encrypt an unencrypted DB|Snapshot → restore encrypted|
+|Lambda with too many DB connections|RDS Proxy|
+|Enforce IAM auth for DB|RDS Proxy (+ Secrets Manager)|
+|Make app stateless / store sessions|ElastiCache|
+|Real-time leaderboard|ElastiCache Redis Sorted Sets|
 
 ---
 
@@ -340,20 +364,20 @@ mindmap
 
 ## 11. Key Terms
 
-| Term                  | Meaning                                            |
-| --------------------- | -------------------------------------------------- |
-| Managed service       | AWS runs the servers, patching and backups for you |
-| Asynchronous          | Copy happens later; replica may be a little behind |
-| Synchronous           | Copy happens at the same time as the write         |
-| Eventually consistent | Data becomes correct after a short delay           |
-| Failover              | Switching to a backup DB when the main one fails   |
-| Promote               | Turn a replica into its own normal database        |
-| Point-in-Time Restore | Restore DB to an exact past moment                 |
-| RTO                   | Recovery Time Objective — how fast you recover     |
-| Copy-on-write         | Copy data only when it changes                     |
-| T-SQL                 | The SQL language used by Microsoft SQL Server      |
-| Connection pooling    | Many app connections share a few DB connections    |
-| Cache hit / miss      | Data found in cache / not found in cache           |
-| Stale data            | Old data in cache that no longer matches the DB    |
-| TTL                   | Time to live — when cached data expires            |
-| Sharding              | Splitting data across many nodes                   |
+|Term|Meaning|
+|---|---|
+|Managed service|AWS runs the servers, patching and backups for you|
+|Asynchronous|Copy happens later; replica may be a little behind|
+|Synchronous|Copy happens at the same time as the write|
+|Eventually consistent|Data becomes correct after a short delay|
+|Failover|Switching to a backup DB when the main one fails|
+|Promote|Turn a replica into its own normal database|
+|Point-in-Time Restore|Restore DB to an exact past moment|
+|RTO|Recovery Time Objective — how fast you recover|
+|Copy-on-write|Copy data only when it changes|
+|T-SQL|The SQL language used by Microsoft SQL Server|
+|Connection pooling|Many app connections share a few DB connections|
+|Cache hit / miss|Data found in cache / not found in cache|
+|Stale data|Old data in cache that no longer matches the DB|
+|TTL|Time to live — when cached data expires|
+|Sharding|Splitting data across many nodes|

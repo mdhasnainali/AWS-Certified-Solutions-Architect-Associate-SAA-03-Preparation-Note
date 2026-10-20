@@ -8,10 +8,10 @@
 
 An **IP address** is the number that identifies a machine on a network.
 
-| Version | Look                                         | Note                                                            |
-| ------- | -------------------------------------------- | --------------------------------------------------------------- |
-| IPv4    | `1.160.10.240` — four numbers, each 0 to 255 | Most common. About 3.7 billion public addresses, nearly used up |
-| IPv6    | Long string of numbers and letters           | Solves the shortage. Mostly used for IoT                        |
+|Version|Look|Note|
+|---|---|---|
+|IPv4|`1.160.10.240` — four numbers, each 0 to 255|Most common. About 3.7 billion public addresses, nearly used up|
+|IPv6|Long string of numbers and letters|Solves the shortage. Mostly used for IoT|
 
 ### 1.1 Public vs private
 
@@ -35,12 +35,12 @@ An **Elastic IP** is a public IPv4 that you own and keep, even when the instance
 
 It can hide the failure of an instance: move the Elastic IP to a healthy instance and users keep the same address.
 
-| Fact      | Detail                                                                            |
-| --------- | --------------------------------------------------------------------------------- |
-| Limit     | 5 per account by default. You can ask AWS for more                                |
-| Cost      | About $0.005 per hour (around $3.50 per month), charged whether you use it or not |
-| Free tier | 750 hours per month of public IPv4 in the first year                              |
-| Releasing | Disassociate **and release** it, otherwise you keep paying                        |
+|Fact|Detail|
+|---|---|
+|Limit|5 per account by default. You can ask AWS for more|
+|Cost|About $0.005 per hour (around $3.50 per month), charged whether you use it or not|
+|Free tier|750 hours per month of public IPv4 in the first year|
+|Releasing|Disassociate **and release** it, otherwise you keep paying|
 
 > Avoid Elastic IPs. They are seen as poor architecture. Better: use a normal public IP with a **DNS name** (Route 53), or put a **Load Balancer** in front and use no public IP at all.
 
@@ -57,11 +57,11 @@ flowchart TD
     PG --> P["Partition · groups of racks"]
 ```
 
-| Strategy      | Where instances go                                               | Main benefit                                                                  | Main limit / risk                      | Use case                                                |
-| ------------- | ---------------------------------------------------------------- | ----------------------------------------------------------------------------- | -------------------------------------- | ------------------------------------------------------- |
-| **Cluster**   | All in **one AZ**, very close together                           | 10 Gbps low latency network between them                                      | If that AZ fails, **everything fails** | Fast big data jobs needing very high throughput         |
-| **Spread**    | Each on **different hardware**, can span many AZs                | Failures are isolated from each other                                         | Max **7 instances per AZ** per group   | Small critical applications, maximum availability       |
-| **Partition** | Spread across **partitions**, each partition is a different rack | Scales to **hundreds** of instances; one rack failure hits one partition only | Max **7 partitions per AZ**            | Partition aware big data: HDFS, HBase, Cassandra, Kafka |
+|Strategy|Where instances go|Main benefit|Main limit / risk|Use case|
+|---|---|---|---|---|
+|**Cluster**|All in **one AZ**, very close together|10 Gbps low latency network between them|If that AZ fails, **everything fails**|Fast big data jobs needing very high throughput|
+|**Spread**|Each on **different hardware**, can span many AZs|Failures are isolated from each other|Max **7 instances per AZ** per group|Small critical applications, maximum availability|
+|**Partition**|Spread across **partitions**, each partition is a different rack|Scales to **hundreds** of instances; one rack failure hits one partition only|Max **7 partitions per AZ**|Partition aware big data: HDFS, HBase, Cassandra, Kafka|
 
 Instances can read which partition they are in through the **metadata service**.
 
@@ -75,12 +75,12 @@ An **ENI** is a virtual network card inside a VPC. It is what gives an EC2 insta
 
 The first one, `eth0`, is the **primary ENI** and is created with the instance. You can add more, such as `eth1`.
 
-| An ENI can hold          | Detail                                  |
-| ------------------------ | --------------------------------------- |
-| Private IPv4             | One primary, plus one or more secondary |
-| Public IPv4 / Elastic IP | One Elastic IPv4 per private IPv4       |
-| Security groups          | One or more                             |
-| MAC address              | One                                     |
+|An ENI can hold|Detail|
+|---|---|
+|Private IPv4|One primary, plus one or more secondary|
+|Public IPv4 / Elastic IP|One Elastic IPv4 per private IPv4|
+|Security groups|One or more|
+|MAC address|One|
 
 ### 3.1 Why ENIs matter
 
@@ -125,14 +125,14 @@ uptime
 
 ### 4.1 Requirements and limits
 
-| Requirement        | Detail                                                                         |
-| ------------------ | ------------------------------------------------------------------------------ |
-| Root volume        | Must be **EBS**, must be **encrypted**, and must be big enough to hold the RAM |
-| RAM size           | Less than 150 GB                                                               |
-| Instances          | Not supported on bare metal                                                    |
-| OS                 | Linux and Windows both work                                                    |
-| Purchasing options | On-Demand, Reserved and Spot all supported                                     |
-| Duration           | No longer than 60 days                                                         |
+|Requirement|Detail|
+|---|---|
+|Root volume|Must be **EBS**, must be **encrypted**, and must be big enough to hold the RAM|
+|RAM size|Less than 150 GB|
+|Instances|Not supported on bare metal|
+|OS|Linux and Windows both work|
+|Purchasing options|On-Demand, Reserved and Spot all supported|
+|Duration|No longer than 60 days|
 
 Use it for long-running processes you do not want to restart, for keeping RAM state, and for services that take a long time to initialise.
 
@@ -191,21 +191,21 @@ mindmap
 
 ## 7. Key Terms
 
-| Term                         | Meaning                                                                      |
-| ---------------------------- | ---------------------------------------------------------------------------- |
-| IPv4                         | Address made of four numbers, each 0 to 255                                  |
-| IPv6                         | Longer newer address format, mostly for IoT                                  |
-| Public IP                    | Address reachable from the internet, unique worldwide                        |
-| Private IP                   | Address reachable only inside a private network                              |
-| NAT device                   | Lets private machines reach the internet through a shared address            |
-| Internet Gateway             | The door between a private AWS network and the internet                      |
-| Elastic IP                   | A public IPv4 you own and keep across stop and start                         |
-| Placement Group              | A rule telling AWS how to place instances on hardware                        |
-| Cluster / Spread / Partition | The three placement strategies                                               |
-| Rack                         | A physical set of hardware in a data centre; one partition equals one rack   |
-| Metadata service             | Service an instance calls to learn facts about itself, such as its partition |
-| ENI                          | Elastic Network Interface — a virtual network card                           |
-| `eth0`                       | The primary network interface of an instance                                 |
-| Failover                     | Moving work or an address to a healthy machine when one fails                |
-| Hibernate                    | Save RAM to disk so the instance restarts in the same state                  |
-| `uptime`                     | Linux command showing how long the machine has run since its last boot       |
+|Term|Meaning|
+|---|---|
+|IPv4|Address made of four numbers, each 0 to 255|
+|IPv6|Longer newer address format, mostly for IoT|
+|Public IP|Address reachable from the internet, unique worldwide|
+|Private IP|Address reachable only inside a private network|
+|NAT device|Lets private machines reach the internet through a shared address|
+|Internet Gateway|The door between a private AWS network and the internet|
+|Elastic IP|A public IPv4 you own and keep across stop and start|
+|Placement Group|A rule telling AWS how to place instances on hardware|
+|Cluster / Spread / Partition|The three placement strategies|
+|Rack|A physical set of hardware in a data centre; one partition equals one rack|
+|Metadata service|Service an instance calls to learn facts about itself, such as its partition|
+|ENI|Elastic Network Interface — a virtual network card|
+|`eth0`|The primary network interface of an instance|
+|Failover|Moving work or an address to a healthy machine when one fails|
+|Hibernate|Save RAM to disk so the instance restarts in the same state|
+|`uptime`|Linux command showing how long the machine has run since its last boot|
